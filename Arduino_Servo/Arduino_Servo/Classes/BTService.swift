@@ -94,9 +94,11 @@ class BTService: NSObject, CBPeripheralDelegate {
     // Mark: - Private
 
     func writePosition(_ position: UInt8) {
-
-        /******** (1) CODE TO BE ADDED *******/
-
+        // See if characteristic has been discovered before writing to it
+        if let positionCharacteristic = self.positionCharacteristic {
+            let data = Data(bytes: [position])
+            self.peripheral?.writeValue(data, for: positionCharacteristic, type: CBCharacteristicWriteType.withResponse)
+        }
     }
 
     func sendBTServiceNotificationWithIsBluetoothConnected(_ isBluetoothConnected: Bool) {

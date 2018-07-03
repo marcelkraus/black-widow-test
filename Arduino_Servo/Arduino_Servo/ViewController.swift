@@ -75,10 +75,40 @@ class ViewController: UIViewController {
         });
     }
 
+    // Valid position range: 0 to 180
     func sendPosition(_ position: UInt8) {
+        // 1
+        if !allowTX {
+            return
+        }
 
-        /******** (2) CODE TO BE ADDED *******/
+        // 2
+        // Validate value
+        if position == lastPosition {
+            return
+        }
+        // 3
+        else if ((position < 0) || (position > 180)) {
+            return
+        }
 
+        // 4
+        // Send position to BLE Shield (if service exists and is connected)
+        if let bleService = btDiscoverySharedInstance.bleService {
+            bleService.writePosition(position)
+            lastPosition = position
+
+            // 5
+            // Start delay timer
+            allowTX = false
+            if timerTXDelay == nil {
+                timerTXDelay = Timer.scheduledTimer(timeInterval: 0.1,
+                                                    target: self,
+                                                    selector: #selector(ViewController.timerTXDelayElapsed),
+                                                    userInfo: nil,
+                                                    repeats: false)
+            }
+        }
     }
 
     func timerTXDelayElapsed() {
